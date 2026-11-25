@@ -2,6 +2,51 @@
 [![Run on Brainlife.io](https://img.shields.io/badge/Brainlife-brainlife.app.506-blue.svg)](https://doi.org/10.25663/brainlife.app.506)
 
 # app-mp2rage-denoiseUNI
+
+<!-- brainlife-app:begin (generated from the App manifest; edit the manifest, not this block) -->
+
+> **Denoises the UNI image of a Siemens MP2RAGE acquisition by robust combination with the two inversion images (Marques MP2RAGE scripts, compiled MATLAB), with a user-given or automatically selected regularisation parameter.**
+
+Applies the RobustCombination background-noise suppression of O'Brien/Marques to the MP2RAGE UNI image using the INV1 and INV2 magnitude images. If reg_param is left empty, the App tries a range of values (1 to 96) within a brain mask (user-provided, or made with FSL robustfov and bet) and picks the one where the brain intensities stop changing, using acquisition parameters from the image metadata. Use it before computing T1 and R1 maps (app-mp2rage-calculateT1andR1). Only Siemens MP2RAGE data are supported.
+
+| | |
+|---|---|
+| 📥 **Inputs** | `neuro/anat/mp2rage` · `neuro/mask` (optional) |
+| 📤 **Outputs** | `neuro/anat/mp2rage` |
+| 🐳 **Container** | `brainlife/fsl:5.0.9` |
+| ⚙️ **Resources** | 1 CPUs |
+| 🔗 **Run it** | [doi.org/10.25663/brainlife.app.506](https://doi.org/10.25663/brainlife.app.506) |
+
+#### 📥 Inputs
+
+| Input | Datatype | Required | Description |
+|---|---|---|---|
+| `neuro/anat/mp2rage` | `neuro/anat/mp2rage` | yes | Siemens MP2RAGE dataset: INV1 and INV2 magnitude images, the UNI image and their JSON sidecars. For automatic parameter selection the sidecars need MagneticFieldStrength, RepetitionTime, InversionTime, BaseResolution, PercentPhaseFOV, PartialFourier and FlipAngle. |
+| `neuro/mask` | `neuro/mask` | no | Optional brain mask used when selecting the regularisation parameter; otherwise one is made with FSL bet. Must have the same dimensions as the UNI image. |
+
+#### 📤 Outputs
+
+| Output | Datatype | Description |
+|---|---|---|
+| `output` | `neuro/anat/mp2rage` | UNI image with noise removed, for use in estimating T1 and R1 values |
+
+<details>
+<summary><b>⚙️ Parameters</b> (2)</summary>
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `reg_param` | string | `16` | The regularization parameter that is best for your dataset depends on several factors. If you are not sure what regularization parameter to select, leave this field blank and we will select the best parameter for your dataset. |
+| `slicesperslab` | number |  | Slices Per Slab should be available in the MRI sequence protocol. It is not always available in the image's header information. If you are sure that Slices Per Slab is available in the image's header information, you can leave this blank and we will get the value from there. Otherwise, please look up this value in the MRI sequence protocol and enter it here. |
+
+</details>
+
+📚 **References used by this App:**
+- Marques J. P., Kober T., Krueger G., van der Zwaag W., Van de Moortele P.-F., Gruetter R. MP2RAGE, a self bias-field corrected sequence for improved segmentation and T1-mapping at high field. NeuroImage 49(2):1271-1281 (2010).
+- Marques J. P., Gruetter R. New developments and applications of the MP2RAGE sequence - focusing the contrast and high spatial resolution R1 mapping. PLoS One 8(7):e69294 (2013).
+- Avesani P. et al. The open diffusion data derivatives, brain data upcycling via integrated publishing of derivatives and reproducible open cloud services. Sci Data 6, 69 (2019). [doi:10.1038/s41597-019-0073-y](https://doi.org/10.1038/s41597-019-0073-y)
+
+<!-- brainlife-app:end -->
+
 This app denoises an MP2RAGE_UNI image so that it can be used to calculate T1 and R1 maps (see app-mp2rage-calculateT1andR1). The app is capable of selecting the regularization parameter for the denoising step or the user may provide the parameter.
 
 Currently, only MP2RAGE data collected on Siemens MRI scanners is supported.
